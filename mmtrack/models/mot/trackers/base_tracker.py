@@ -63,22 +63,22 @@ class BaseTracker(metaclass=ABCMeta):
         if not hasattr(self, 'memo_items'):
             self.memo_items = memo_items
         else:
-            assert memo_items == self.memo_items
+            assert memo_items == self.memo_items            # Check update items have coherent(same order!) keys.
 
         assert 'ids' in memo_items
         num_objs = len(kwargs['ids'])
-        id_indice = memo_items.index('ids')
+        id_indice = memo_items.index('ids')                 # index is func of list.
         assert 'frame_ids' in memo_items
         frame_id = int(kwargs['frame_ids'])
         if isinstance(kwargs['frame_ids'], int):
             kwargs['frame_ids'] = torch.tensor([kwargs['frame_ids']] *
-                                               num_objs)
+                                               num_objs)    # frame_id of each objs
         # cur_frame_id = int(kwargs['frame_ids'][0])
         for k, v in kwargs.items():
             if len(v) != num_objs:
                 raise ValueError()
 
-        for obj in zip(*kwargs.values()):
+        for obj in zip(*kwargs.values()):           # choose to update/init track, then pop invalid tracks.
             id = int(obj[id_indice])
             if id in self.tracks:
                 self.update_track(id, obj)
@@ -87,7 +87,7 @@ class BaseTracker(metaclass=ABCMeta):
 
         self.pop_invalid_tracks(frame_id)
 
-    def pop_invalid_tracks(self, frame_id):
+    def pop_invalid_tracks(self, frame_id):    # frame_id -> append type, pop when timeout.
         """Pop out invalid tracks."""
         invalid_ids = []
         for k, v in self.tracks.items():
@@ -98,7 +98,7 @@ class BaseTracker(metaclass=ABCMeta):
 
     def update_track(self, id, obj):
         """Update a track."""
-        for k, v in zip(self.memo_items, obj):
+        for k, v in zip(self.memo_items, obj):  # update track id with obj, two types of items in obj, list for append, value use momentums agg.
             v = v[None]
             if self.momentums is not None and k in self.momentums:
                 m = self.momentums[k]
@@ -106,7 +106,7 @@ class BaseTracker(metaclass=ABCMeta):
             else:
                 self.tracks[id][k].append(v)
 
-    def init_track(self, id, obj):
+    def init_track(self, id, obj):      # Init as dict of a track, two types of items as update_track.
         """Initialize a track."""
         self.tracks[id] = Dict()
         for k, v in zip(self.memo_items, obj):
@@ -117,7 +117,7 @@ class BaseTracker(metaclass=ABCMeta):
                 self.tracks[id][k] = [v]
 
     @property
-    def memo(self):
+    def memo(self):         # Return dict, for all keys in memo_items, return all tracks` final item(for list type, is the final item)
         """Return all buffers in the tracker."""
         outs = Dict()
         for k in self.memo_items:
@@ -155,7 +155,7 @@ class BaseTracker(metaclass=ABCMeta):
             ids = self.ids
 
         outs = []
-        for id in ids:
+        for id in ids:      # if get list item, can use num_samples to cat multi-samples, mean can be set by behavior.
             out = self.tracks[id][item]
             if isinstance(out, list):
                 if num_samples is not None:
