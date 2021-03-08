@@ -100,7 +100,7 @@ class Tracktor(BaseMultiObjectTracker):
         """
         frame_id = img_metas[0].get('frame_id', -1)
         if frame_id == 0:
-            self.tracker.reset()
+            self.tracker.reset()        # frame_id == 0 is the key to reset!!
 
         x = self.detector.extract_feat(img)
         if hasattr(self.detector, 'roi_head'):

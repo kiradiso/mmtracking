@@ -9,6 +9,7 @@ from .transforms import (SeqBlurAug, SeqColorAug, SeqCropLikeSiamFC,
                          SeqNormalize, SeqPad, SeqPhotoMetricDistortion,
                          SeqRandomCrop, SeqRandomFlip, SeqResize,
                          SeqShiftScaleAug)
+from .ctrack_processing import CTrackTarget
 
 __all__ = [
     'PIPELINES', 'LoadMultiImagesFromFile', 'SeqLoadAnnotations', 'SeqResize',
@@ -16,5 +17,5 @@ __all__ = [
     'VideoCollect', 'ConcatVideoReferences', 'LoadDetections',
     'MatchInstances', 'SeqRandomCrop', 'SeqPhotoMetricDistortion',
     'SeqCropLikeSiamFC', 'SeqShiftScaleAug', 'SeqBlurAug', 'SeqColorAug',
-    'ToList'
+    'ToList', 'CTrackTarget'
 ]

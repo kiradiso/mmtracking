@@ -12,8 +12,12 @@ class MatchInstances(object):
         to True.
     """
 
-    def __init__(self, skip_nomatch=True):
+    def __init__(self, skip_nomatch=True, match_keys='gt_instance_ids'):
         self.skip_nomatch = skip_nomatch
+        if isinstance(match_keys, str):
+            match_keys = (match_keys, match_keys)
+        assert isinstance(match_keys, tuple) and len(match_keys) == 2
+        self.match_keys = match_keys
 
     def _match_gts(self, instance_ids, ref_instance_ids):
         """Matching objects according to ground truth `instance_ids`.
@@ -43,7 +47,7 @@ class MatchInstances(object):
             raise NotImplementedError('Only support match 2 images now.')
 
         match_indices, ref_match_indices = self._match_gts(
-            results[0]['gt_instance_ids'], results[1]['gt_instance_ids'])
+            results[0][self.match_keys[0]], results[1][self.match_keys[1]])
         nomatch = (match_indices == -1).all()
         if self.skip_nomatch and nomatch:
             return None

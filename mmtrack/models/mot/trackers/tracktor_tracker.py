@@ -146,6 +146,8 @@ class TracktorTracker(BaseTracker):
                 feats, img_metas, model.detector, frame_id, rescale)
 
             # filter bboxes with propagated tracks
+            # bboxes from rpn output or public detections to rpn
+            # prop_bboxes from last frame tracks to rpn
             ious = bbox_overlaps(bboxes[:, :4], prop_bboxes[:, :4])         # use public detections, for new tracks.
             valid_inds = (ious < self.regression['match_iou_thr']).all(dim=1)
             bboxes = bboxes[valid_inds]

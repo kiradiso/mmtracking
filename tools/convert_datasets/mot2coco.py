@@ -55,6 +55,9 @@ def parse_args():
         '--split-train',
         action='store_true',
         help='split the train set into half-train and half-validate.')
+    parser.add_argument(
+        '--substr', type=str, default='',
+        help='Generate part train and val with specified filename')
     return parser.parse_args()
 
 
@@ -124,6 +127,13 @@ def main():
             det_file = osp.join(args.output, f'{subset}_detections.pkl')
             detections = dict(bbox_results=dict())
         video_names = os.listdir(in_folder)
+        if args.substr != '':
+            str_filter = args.substr
+            out_file = osp.join(args.output, f'{subset}_cocoformat_{str_filter}.json')
+            if args.convert_det:
+                det_file = osp.join(args.output, f'{subset}_detections_{str_filter}.pkl')
+            video_names = list(filter(lambda x: str_filter in x, video_names))
+            print(f"Filtered videonames {video_names}")
         for video_name in tqdm(video_names):
             # basic params
             parse_gt = 'test' not in subset
